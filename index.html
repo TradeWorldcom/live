@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Investment Platform</title>
+    <title>InvestPro | Professional Investment Platform</title>
     <style>
         /* Reset and Base Styles */
         * {
@@ -67,25 +67,17 @@
             color: #FFD700;
         }
         
-        .auth-buttons {
+        .user-profile {
             display: flex;
             align-items: center;
+            color: white;
         }
         
-        .auth-buttons button {
-            background-color: #FFD700;
-            color: #002366;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 1rem;
-            transition: background-color 0.3s;
-        }
-        
-        .auth-buttons button:hover {
-            background-color: #e6c200;
+        .user-profile img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
         }
         
         /* Main Content Styles */
@@ -139,6 +131,12 @@
             text-align: center;
         }
         
+        .auth-options {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
         /* Dashboard Content Styles */
         .dashboard-content {
             flex: 1;
@@ -146,18 +144,33 @@
         }
         
         .welcome-banner {
-            background-color: #002366;
+            background: linear-gradient(135deg, #002366 0%, #004080 100%);
             color: white;
             padding: 1.5rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .welcome-banner h2 {
+        .welcome-text h2 {
             margin-bottom: 0.5rem;
             font-size: 1.5rem;
         }
         
+        .welcome-text p {
+            opacity: 0.9;
+        }
+        
+        .user-id {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Dashboard Cards */
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -170,33 +183,52 @@
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        
+        .balance-card::before {
+            background-color: #FFD700;
+        }
+        
+        .referral-card::before {
+            background-color: #4CAF50;
+        }
+        
+        .team-card::before {
+            background-color: #2196F3;
         }
         
         .card h3 {
             color: #555;
             margin-bottom: 1rem;
             font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
         }
         
         .card .value {
             font-size: 2rem;
             font-weight: bold;
             color: #002366;
+            margin-bottom: 0.5rem;
         }
         
-        .balance-card {
-            border-top: 4px solid #FFD700;
+        .card .subtext {
+            color: #666;
+            font-size: 0.9rem;
         }
         
-        .referral-card {
-            border-top: 4px solid #4CAF50;
-        }
-        
-        .team-card {
-            border-top: 4px solid #2196F3;
-        }
-        
-        /* Transfer Money Section */
+        /* Transfer Section */
         .transfer-section {
             background-color: white;
             border-radius: 8px;
@@ -217,7 +249,7 @@
             gap: 1rem;
         }
         
-        .transfer-form input, .transfer-form select {
+        .transfer-form input {
             padding: 0.8rem;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -239,15 +271,16 @@
             background-color: #001a4d;
         }
         
-        /* Trading Display Section */
-        .trading-display {
+        /* Trading Section */
+        .trading-section {
             background-color: white;
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
         }
         
-        .trading-display h2 {
+        .trading-section h2 {
             color: #002366;
             margin-bottom: 1rem;
             font-size: 1.3rem;
@@ -255,7 +288,7 @@
         
         .trading-pairs {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
         }
         
@@ -281,37 +314,53 @@
         
         .pair-value {
             font-weight: bold;
+        }
+        
+        .profit {
             color: #4CAF50;
+        }
+        
+        .loss {
+            color: #f44336;
+        }
+        
+        .profit-loss {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .profit-amount, .loss-amount {
+            font-size: 0.9rem;
+        }
+        
+        /* Market Stats */
+        .market-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-card h4 {
+            color: #002366;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
         }
         
         /* Mobile Styles */
         @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-            
-            nav {
-                display: none;
-            }
-            
-            nav.active {
-                display: block;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background-color: #002366;
-                padding: 1rem;
-            }
-            
-            nav.active ul {
-                flex-direction: column;
-            }
-            
-            nav.active ul li {
-                margin: 0.5rem 0;
-            }
-            
             .container {
                 flex-direction: column;
             }
@@ -320,17 +369,22 @@
                 position: fixed;
                 top: 70px;
                 left: 0;
+                width: 100%;
                 height: calc(100vh - 70px);
                 z-index: 90;
                 transform: translateX(-100%);
+                padding: 1rem;
             }
             
             .side-menu.active {
                 transform: translateX(0);
             }
             
+            .menu-toggle {
+                display: block;
+            }
+            
             .dashboard-content {
-                margin-left: 0;
                 padding: 1rem;
             }
             
@@ -338,29 +392,33 @@
                 grid-template-columns: 1fr;
             }
             
-            .cards-container {
-                grid-template-columns: 1fr;
+            .welcome-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-id {
+                margin-top: 1rem;
+                align-self: flex-end;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <button class="menu-toggle" id="menuToggle">☰</button>
         <div class="logo">InvestPro</div>
-        <nav id="mainNav">
+        <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="#">About Us</a></li>
                 <li><a href="#">Contact</a></li>
             </ul>
         </nav>
-        <div class="auth-buttons">
-            <button id="loginBtn">Login</button>
-            <button id="signupBtn">Sign Up</button>
-            <span id="userGreeting" style="display: none; color: white; margin-right: 1rem;"></span>
-            <button id="logoutBtn" style="display: none;">Logout</button>
+        <div class="user-profile" id="userProfile" style="display: none;">
+            <img src="https://via.placeholder.com/30" alt="Profile" id="profileImage">
+            <span id="userName">User</span>
         </div>
+        <button class="menu-toggle" id="menuToggle">☰</button>
     </header>
     
     <div class="container">
@@ -376,66 +434,107 @@
                 <li><a href="affiliate.html"><i>👥</i> Affiliate</a></li>
                 <li><a href="referral.html"><i>📢</i> Referral Program</a></li>
                 <li><a href="transactions.html"><i>📝</i> Transaction History</a></li>
-                <li><a href="#" id="sideLogoutBtn"><i>🚪</i> Logout</a></li>
             </ul>
+            
+            <div class="auth-options" id="authOptions">
+                <li><a href="login.html"><i>🔑</i> Login</a></li>
+                <li><a href="signup.html"><i>✍️</i> Sign Up</a></li>
+                <li><a href="#" id="logoutBtn" style="display: none;"><i>🚪</i> Logout</a></li>
+            </div>
         </aside>
         
         <!-- Dashboard Content -->
         <main class="dashboard-content">
-            <div class="welcome-banner">
-                <h2 id="welcomeMessage">Welcome to InvestPro</h2>
-                <p id="welcomeSubtext">Sign in to access your dashboard</p>
+            <div class="welcome-banner" id="welcomeBanner">
+                <div class="welcome-text">
+                    <h2 id="welcomeMessage">Welcome to InvestPro</h2>
+                    <p id="welcomeSubtext">Sign in to access your dashboard</p>
+                </div>
+                <div class="user-id" id="userIdDisplay" style="display: none;">ID: <span id="userId"></span></div>
             </div>
             
+            <!-- Dashboard Cards -->
             <div class="cards-container" id="dashboardCards" style="display: none;">
                 <div class="card balance-card">
-                    <h3>My Balance</h3>
+                    <h3>My Balance <span id="balanceStatus"></span></h3>
                     <div class="value" id="userBalance">$0.00</div>
+                    <div class="subtext">Available for withdrawal</div>
                 </div>
                 
                 <div class="card referral-card">
                     <h3>Direct Referral Earnings</h3>
                     <div class="value" id="referralEarnings">$0.00</div>
+                    <div class="subtext">From your direct referrals</div>
                 </div>
                 
                 <div class="card team-card">
                     <h3>Total Team</h3>
                     <div class="value" id="totalTeam">0</div>
+                    <div class="subtext">Across all levels</div>
                 </div>
             </div>
             
+            <!-- Transfer Funds Section -->
             <div class="transfer-section" id="transferSection" style="display: none;">
-                <h2>Transfer Money</h2>
+                <h2>Transfer Funds</h2>
                 <form class="transfer-form" id="transferForm">
                     <input type="text" id="recipientId" placeholder="Recipient User ID" required>
-                    <input type="number" id="transferAmount" placeholder="Amount" min="1" required>
+                    <input type="number" id="transferAmount" placeholder="Amount ($)" min="1" step="0.01" required>
                     <button type="submit">Send</button>
                 </form>
             </div>
             
-            <div class="trading-display">
-                <h2>Live Market Data</h2>
+            <!-- Trading Section -->
+            <div class="trading-section">
+                <h2>Live Trading Performance</h2>
                 <div class="trading-pairs">
                     <div class="trading-pair">
                         <div class="pair-info">
                             <h4>Bitcoin (BTC)</h4>
-                            <span>24h change</span>
+                            <span>24h trading performance</span>
                         </div>
-                        <div class="pair-value" id="btcValue">$7,542.36</div>
+                        <div class="profit-loss">
+                            <div class="pair-value profit" id="btcValue">$7,542.36</div>
+                            <div class="profit-amount profit" id="btcProfit">+$542.36 (7.2%)</div>
+                            <div class="loss-amount loss" id="btcLoss" style="display: none;"></div>
+                        </div>
                     </div>
                     <div class="trading-pair">
                         <div class="pair-info">
                             <h4>Ethereum (ETH)</h4>
-                            <span>24h change</span>
+                            <span>24h trading performance</span>
                         </div>
-                        <div class="pair-value" id="ethValue">$4,218.75</div>
+                        <div class="profit-loss">
+                            <div class="pair-value profit" id="ethValue">$4,218.75</div>
+                            <div class="profit-amount profit" id="ethProfit">+$218.75 (5.5%)</div>
+                            <div class="loss-amount loss" id="ethLoss" style="display: none;"></div>
+                        </div>
                     </div>
                     <div class="trading-pair">
                         <div class="pair-info">
                             <h4>Cardano (ADA)</h4>
-                            <span>24h change</span>
+                            <span>24h trading performance</span>
                         </div>
-                        <div class="pair-value" id="adaValue">$6,879.42</div>
+                        <div class="profit-loss">
+                            <div class="pair-value loss" id="adaValue">$6,879.42</div>
+                            <div class="profit-amount profit" id="adaProfit" style="display: none;"></div>
+                            <div class="loss-amount loss" id="adaLoss">-$120.58 (1.7%)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="market-stats">
+                    <div class="stat-card">
+                        <h4>Total Profit</h4>
+                        <div class="stat-value profit" id="totalProfit">$761.11</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Loss</h4>
+                        <div class="stat-value loss" id="totalLoss">$120.58</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Success Rate</h4>
+                        <div class="stat-value" id="successRate">70%</div>
                     </div>
                 </div>
             </div>
@@ -468,44 +567,52 @@
         // DOM elements
         const menuToggle = document.getElementById('menuToggle');
         const sideMenu = document.getElementById('sideMenu');
-        const mainNav = document.getElementById('mainNav');
-        const loginBtn = document.getElementById('loginBtn');
-        const signupBtn = document.getElementById('signupBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const sideLogoutBtn = document.getElementById('sideLogoutBtn');
-        const userGreeting = document.getElementById('userGreeting');
+        const userProfile = document.getElementById('userProfile');
+        const profileImage = document.getElementById('profileImage');
+        const userName = document.getElementById('userName');
         const welcomeMessage = document.getElementById('welcomeMessage');
         const welcomeSubtext = document.getElementById('welcomeSubtext');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const userId = document.getElementById('userId');
         const dashboardCards = document.getElementById('dashboardCards');
         const transferSection = document.getElementById('transferSection');
         const transferForm = document.getElementById('transferForm');
         const userBalance = document.getElementById('userBalance');
+        const balanceStatus = document.getElementById('balanceStatus');
         const referralEarnings = document.getElementById('referralEarnings');
         const totalTeam = document.getElementById('totalTeam');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authOptions = document.getElementById('authOptions');
         
         // Mobile menu toggle
         menuToggle.addEventListener('click', () => {
-            mainNav.classList.toggle('active');
+            sideMenu.classList.toggle('active');
         });
         
-        // Side menu toggle for mobile
-        if (window.innerWidth <= 768) {
-            menuToggle.addEventListener('click', () => {
-                sideMenu.classList.toggle('active');
-            });
-        }
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!sideMenu.contains(e.target) && e.target !== menuToggle) {
+                sideMenu.classList.remove('active');
+            }
+        });
         
         // Check auth state
         auth.onAuthStateChanged(user => {
             if (user) {
                 // User is signed in
-                loginBtn.style.display = 'none';
-                signupBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                sideLogoutBtn.style.display = 'block';
-                userGreeting.style.display = 'block';
+                userProfile.style.display = 'flex';
+                userIdDisplay.style.display = 'block';
                 dashboardCards.style.display = 'grid';
                 transferSection.style.display = 'block';
+                logoutBtn.style.display = 'block';
+                
+                // Hide login/signup options
+                const authLinks = authOptions.querySelectorAll('a');
+                authLinks.forEach(link => {
+                    if (!link.id.includes('logout')) {
+                        link.style.display = 'none';
+                    }
+                });
                 
                 // Load user data
                 loadUserData(user.uid);
@@ -513,45 +620,41 @@
                 // Update welcome message
                 database.ref('users/' + user.uid).once('value').then(snapshot => {
                     const userData = snapshot.val();
-                    if (userData && userData.name) {
-                        welcomeMessage.textContent = `Welcome back, ${userData.name}!`;
-                        userGreeting.textContent = `Hi, ${userData.name.split(' ')[0]}`;
-                    } else {
-                        welcomeMessage.textContent = 'Welcome back, Investor!';
+                    if (userData) {
+                        welcomeMessage.textContent = `Welcome back, ${userData.name || 'Investor'}!`;
+                        welcomeSubtext.textContent = 'Track your investments and grow your portfolio';
+                        userName.textContent = userData.name || 'User';
+                        userId.textContent = user.uid.substring(0, 8).toUpperCase();
+                        
+                        // Set profile image if available
+                        if (userData.profileImage) {
+                            profileImage.src = userData.profileImage;
+                        }
                     }
-                    welcomeSubtext.textContent = 'Track your investments and grow your portfolio';
                 });
             } else {
                 // User is signed out
-                loginBtn.style.display = 'block';
-                signupBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                sideLogoutBtn.style.display = 'none';
-                userGreeting.style.display = 'none';
+                userProfile.style.display = 'none';
+                userIdDisplay.style.display = 'none';
                 dashboardCards.style.display = 'none';
                 transferSection.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                
+                // Show login/signup options
+                const authLinks = authOptions.querySelectorAll('a');
+                authLinks.forEach(link => {
+                    if (!link.id.includes('logout')) {
+                        link.style.display = 'block';
+                    }
+                });
                 
                 welcomeMessage.textContent = 'Welcome to InvestPro';
                 welcomeSubtext.textContent = 'Sign in to access your dashboard';
             }
         });
         
-        // Event listeners
-        loginBtn.addEventListener('click', () => {
-            window.location.href = 'login.html';
-        });
-        
-        signupBtn.addEventListener('click', () => {
-            window.location.href = 'signup.html';
-        });
-        
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = 'index.html';
-            });
-        });
-        
-        sideLogoutBtn.addEventListener('click', (e) => {
+        // Logout functionality
+        logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             auth.signOut().then(() => {
                 window.location.href = 'index.html';
@@ -629,15 +732,77 @@
             });
         });
         
-        // Simulate live trading data
+        // Simulate live trading data with profit/loss
         function updateTradingData() {
-            const btcValue = (Math.random() * 5000 + 5000).toFixed(2);
-            const ethValue = (Math.random() * 2000 + 3000).toFixed(2);
-            const adaValue = (Math.random() * 2000 + 6000).toFixed(2);
+            // BTC
+            const btcCurrent = (Math.random() * 5000 + 5000).toFixed(2);
+            const btcChange = (Math.random() * 1000 - 200).toFixed(2);
+            const btcPercent = ((btcChange / (btcCurrent - btcChange)) * 100).toFixed(1);
             
-            document.getElementById('btcValue').textContent = `$${btcValue}`;
-            document.getElementById('ethValue').textContent = `$${ethValue}`;
-            document.getElementById('adaValue').textContent = `$${adaValue}`;
+            if (btcChange >= 0) {
+                document.getElementById('btcValue').textContent = `$${btcCurrent}`;
+                document.getElementById('btcProfit').textContent = `+$${btcChange} (${btcPercent}%)`;
+                document.getElementById('btcProfit').style.display = 'block';
+                document.getElementById('btcLoss').style.display = 'none';
+                document.getElementById('btcValue').className = 'pair-value profit';
+            } else {
+                document.getElementById('btcValue').textContent = `$${btcCurrent}`;
+                document.getElementById('btcLoss').textContent = `-$${Math.abs(btcChange)} (${Math.abs(btcPercent)}%)`;
+                document.getElementById('btcProfit').style.display = 'none';
+                document.getElementById('btcLoss').style.display = 'block';
+                document.getElementById('btcValue').className = 'pair-value loss';
+            }
+            
+            // ETH
+            const ethCurrent = (Math.random() * 2000 + 3000).toFixed(2);
+            const ethChange = (Math.random() * 600 - 150).toFixed(2);
+            const ethPercent = ((ethChange / (ethCurrent - ethChange)) * 100).toFixed(1);
+            
+            if (ethChange >= 0) {
+                document.getElementById('ethValue').textContent = `$${ethCurrent}`;
+                document.getElementById('ethProfit').textContent = `+$${ethChange} (${ethPercent}%)`;
+                document.getElementById('ethProfit').style.display = 'block';
+                document.getElementById('ethLoss').style.display = 'none';
+                document.getElementById('ethValue').className = 'pair-value profit';
+            } else {
+                document.getElementById('ethValue').textContent = `$${ethCurrent}`;
+                document.getElementById('ethLoss').textContent = `-$${Math.abs(ethChange)} (${Math.abs(ethPercent)}%)`;
+                document.getElementById('ethProfit').style.display = 'none';
+                document.getElementById('ethLoss').style.display = 'block';
+                document.getElementById('ethValue').className = 'pair-value loss';
+            }
+            
+            // ADA
+            const adaCurrent = (Math.random() * 2000 + 6000).toFixed(2);
+            const adaChange = (Math.random() * 800 - 300).toFixed(2);
+            const adaPercent = ((adaChange / (adaCurrent - adaChange)) * 100).toFixed(1);
+            
+            if (adaChange >= 0) {
+                document.getElementById('adaValue').textContent = `$${adaCurrent}`;
+                document.getElementById('adaProfit').textContent = `+$${adaChange} (${adaPercent}%)`;
+                document.getElementById('adaProfit').style.display = 'block';
+                document.getElementById('adaLoss').style.display = 'none';
+                document.getElementById('adaValue').className = 'pair-value profit';
+            } else {
+                document.getElementById('adaValue').textContent = `$${adaCurrent}`;
+                document.getElementById('adaLoss').textContent = `-$${Math.abs(adaChange)} (${Math.abs(adaPercent)}%)`;
+                document.getElementById('adaProfit').style.display = 'none';
+                document.getElementById('adaLoss').style.display = 'block';
+                document.getElementById('adaValue').className = 'pair-value loss';
+            }
+            
+            // Calculate totals (70% profit, 30% loss simulation)
+            const totalProfit = (btcChange > 0 ? parseFloat(btcChange) : 0) + 
+                               (ethChange > 0 ? parseFloat(ethChange) : 0) + 
+                               (adaChange > 0 ? parseFloat(adaChange) : 0);
+            
+            const totalLoss = (btcChange < 0 ? Math.abs(parseFloat(btcChange)) : 0) + 
+                             (ethChange < 0 ? Math.abs(parseFloat(ethChange)) : 0) + 
+                             (adaChange < 0 ? Math.abs(parseFloat(adaChange)) : 0);
+            
+            document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(2)}`;
+            document.getElementById('totalLoss').textContent = `$${totalLoss.toFixed(2)}`;
+            document.getElementById('successRate').textContent = `${Math.round((totalProfit / (totalProfit + totalLoss)) * 100)}%`;
         }
         
         // Update every 5 seconds
@@ -652,7 +817,21 @@
                 const userData = snapshot.val();
                 if (userData) {
                     // Update dashboard with real data
-                    userBalance.textContent = `$${(userData.balance || 0).toFixed(2)}`;
+                    const balance = userData.balance || 0;
+                    userBalance.textContent = `$${balance.toFixed(2)}`;
+                    
+                    // Add balance status indicator
+                    if (balance > 1000) {
+                        balanceStatus.textContent = '💰 Excellent';
+                        balanceStatus.style.color = '#4CAF50';
+                    } else if (balance > 100) {
+                        balanceStatus.textContent = '💵 Good';
+                        balanceStatus.style.color = '#2196F3';
+                    } else {
+                        balanceStatus.textContent = '⚠️ Low';
+                        balanceStatus.style.color = '#f44336';
+                    }
+                    
                     referralEarnings.textContent = `$${(userData.referralEarnings || 0).toFixed(2)}`;
                     totalTeam.textContent = userData.teamCount || '0';
                 }
