@@ -335,6 +335,10 @@
                         <label>Registration Date</label>
                         <span id="regDate">January 15, 2023</span>
                     </div>
+                    <div class="info-group">
+                        <label>Referred By</label>
+                        <span id="referredBy">Direct Signup</span>
+                    </div>
                 </div>
             </div>
             
@@ -517,6 +521,14 @@
                     if (userData.referralCode) {
                         const referralUrl = `https://tradeworldcom.github.io/live/signup.html?ref=${userData.referralCode}`;
                         document.getElementById('referralLink').textContent = referralUrl;
+                    }
+                    
+                    // Load referrer information if exists
+                    if (userData.referrerId) {
+                        database.ref('users/' + userData.referrerId).once('value').then(snap => {
+                            const referrer = snap.val();
+                            document.getElementById('referredBy').textContent = referrer.name || referrer.email;
+                        });
                     }
                 }
             });
