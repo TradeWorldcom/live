@@ -415,10 +415,50 @@
                 <p>You are about to purchase the <span id="modalPackageName"></span> package for $<span id="modalPackagePrice"></span>.</p>
                 <p>This amount will be deducted from your account balance.</p>
                 <p id="balanceCheck"></p>
+                <div id="commissionBreakdown" style="margin-top: 1rem; padding: 1rem; background-color: #f5f7fa; border-radius: 4px;">
+                    <h4 style="margin-bottom: 0.5rem; color: #002366;">Commission Breakdown:</h4>
+                    <ul style="list-style-type: none;">
+                        <li><i>✓</i> Direct Referral: 10% ($<span id="directCommission">0</span>)</li>
+                        <li><i>✓</i> Upline Commissions: 2% per level ($<span id="uplineCommission">0</span>)</li>
+                        <li><i>✓</i> Admin Fee: 30% ($<span id="adminFee">0</span>)</li>
+                        <li><i>✓</i> Trading Profit: 50% ($<span id="tradingProfit">0</span>)</li>
+                    </ul>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn" id="cancelPurchase">Cancel</button>
                 <button class="confirm-btn" id="confirmPurchase">Confirm Purchase</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Package Purchase Invoice</h3>
+                <button class="close-btn" id="closeInvoiceModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="invoiceDetails" style="padding: 1rem; background-color: #f5f7fa; border-radius: 4px;">
+                    <h4 style="margin-bottom: 0.5rem; color: #002366;">Invoice #<span id="invoiceNumber"></span></h4>
+                    <p>Date: <span id="invoiceDate"></span></p>
+                    <p>Package: <span id="invoicePackageName"></span></p>
+                    <p>Amount: $<span id="invoiceAmount"></span></p>
+                    <p>Status: <span id="invoiceStatus" style="color: #4CAF50;">Completed</span></p>
+                    
+                    <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; color: #002366;">Commission Distribution:</h4>
+                    <ul style="list-style-type: none;">
+                        <li><i>✓</i> Direct Referral: 10% ($<span id="invoiceDirectCommission">0</span>)</li>
+                        <li><i>✓</i> Upline Commissions: 2% per level ($<span id="invoiceUplineCommission">0</span>)</li>
+                        <li><i>✓</i> Admin Fee: 30% ($<span id="invoiceAdminFee">0</span>)</li>
+                        <li><i>✓</i> Trading Profit: 50% ($<span id="invoiceTradingProfit">0</span>)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="confirm-btn" id="printInvoice">Print Invoice</button>
+                <button class="cancel-btn" id="closeInvoiceBtn">Close</button>
             </div>
         </div>
     </div>
@@ -453,10 +493,32 @@
         const modalPackageName = document.getElementById('modalPackageName');
         const modalPackagePrice = document.getElementById('modalPackagePrice');
         const balanceCheck = document.getElementById('balanceCheck');
+        const invoiceModal = document.getElementById('invoiceModal');
+        const closeInvoiceModal = document.getElementById('closeInvoiceModal');
+        const closeInvoiceBtn = document.getElementById('closeInvoiceBtn');
+        const printInvoice = document.getElementById('printInvoice');
+        
+        // Commission breakdown elements
+        const directCommission = document.getElementById('directCommission');
+        const uplineCommission = document.getElementById('uplineCommission');
+        const adminFee = document.getElementById('adminFee');
+        const tradingProfit = document.getElementById('tradingProfit');
+        
+        // Invoice elements
+        const invoiceNumber = document.getElementById('invoiceNumber');
+        const invoiceDate = document.getElementById('invoiceDate');
+        const invoicePackageName = document.getElementById('invoicePackageName');
+        const invoiceAmount = document.getElementById('invoiceAmount');
+        const invoiceDirectCommission = document.getElementById('invoiceDirectCommission');
+        const invoiceUplineCommission = document.getElementById('invoiceUplineCommission');
+        const invoiceAdminFee = document.getElementById('invoiceAdminFee');
+        const invoiceTradingProfit = document.getElementById('invoiceTradingProfit');
         
         // Variables to store selected package
         let selectedPackage = null;
         let userBalance = 0;
+        let userReferralId = '';
+        let userUplineId = '';
         
         // Check auth state
         auth.onAuthStateChanged(user => {
@@ -509,6 +571,18 @@
                 modalPackageName.textContent = packageName;
                 modalPackagePrice.textContent = packagePrice;
                 
+                // Calculate commission breakdown
+                const directComm = selectedPackage.price * 0.10;
+                const uplineComm = selectedPackage.price * 0.10; // 2% x 5 levels
+                const adminF = selectedPackage.price * 0.30;
+                const tradingProf = selectedPackage.price * 0.50;
+                
+                // Update commission breakdown display
+                directCommission.textContent = directComm.toFixed(2);
+                uplineCommission.textContent = uplineComm.toFixed(2);
+                adminFee.textContent = adminF.toFixed(2);
+                tradingProfit.textContent = tradingProf.toFixed(2);
+                
                 // Check if user has enough balance
                 if (userBalance >= selectedPackage.price) {
                     balanceCheck.textContent = `Your current balance is $${userBalance.toFixed(2)} (sufficient for this purchase).`;
@@ -532,6 +606,19 @@
         cancelPurchaseBtn.addEventListener('click', () => {
             purchaseModal.style.display = 'none';
         });
+
+        // Invoice modal controls
+        closeInvoiceModal.addEventListener('click', () => {
+            invoiceModal.style.display = 'none';
+        });
+
+        closeInvoiceBtn.addEventListener('click', () => {
+            invoiceModal.style.display = 'none';
+        });
+
+        printInvoice.addEventListener('click', () => {
+            window.print();
+        });
         
         confirmPurchaseBtn.addEventListener('click', () => {
             if (!selectedPackage || !auth.currentUser) return;
@@ -542,7 +629,9 @@
                 packageName: selectedPackage.name,
                 amount: selectedPackage.price,
                 purchaseDate: new Date().toISOString(),
-                status: 'active'
+                status: 'active',
+                dailyProfit: selectedPackage.price * 0.015, // 1.5% daily
+                endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
             };
             
             // Create a transaction record
@@ -559,6 +648,12 @@
             const userRef = database.ref('users/' + userId);
             const transactionsRef = database.ref('transactions').push();
             
+            // Calculate commissions
+            const directComm = selectedPackage.price * 0.10;
+            const uplineComm = selectedPackage.price * 0.10; // 2% x 5 levels
+            const adminF = selectedPackage.price * 0.30;
+            const tradingProf = selectedPackage.price * 0.50;
+            
             // Update user data and create transaction
             database.ref().update({
                 [`users/${userId}/activePackage`]: packageData,
@@ -566,16 +661,37 @@
                 [`transactions/${transactionsRef.key}`]: transactionData
             })
             .then(() => {
-                alert('Package purchased successfully!');
-                purchaseModal.style.display = 'none';
+                // Show invoice
+                showInvoice(selectedPackage, directComm, uplineComm, adminF, tradingProf);
                 
-                // Trigger commission distribution via Cloud Function
-                distributeCommissions(userId, selectedPackage.price);
+                // Distribute commissions
+                distributeCommissions(userId, selectedPackage.price, directComm, uplineComm, adminF, tradingProf);
             })
             .catch(error => {
                 alert('Error purchasing package: ' + error.message);
             });
         });
+        
+        // Show invoice after purchase
+        function showInvoice(pkg, directComm, uplineComm, adminF, tradingProf) {
+            purchaseModal.style.display = 'none';
+            
+            // Generate random invoice number
+            const invNumber = 'INV-' + Math.floor(Math.random() * 1000000);
+            
+            // Set invoice details
+            invoiceNumber.textContent = invNumber;
+            invoiceDate.textContent = new Date().toLocaleDateString();
+            invoicePackageName.textContent = pkg.name;
+            invoiceAmount.textContent = pkg.price.toFixed(2);
+            invoiceDirectCommission.textContent = directComm.toFixed(2);
+            invoiceUplineCommission.textContent = uplineComm.toFixed(2);
+            invoiceAdminFee.textContent = adminF.toFixed(2);
+            invoiceTradingProfit.textContent = tradingProf.toFixed(2);
+            
+            // Show invoice modal
+            invoiceModal.style.display = 'flex';
+        }
         
         // Load user data from Firebase
         function loadUserData(userId) {
@@ -585,16 +701,85 @@
                 const userData = snapshot.val();
                 if (userData) {
                     userBalance = userData.balance || 0;
+                    userReferralId = userData.referralId || '';
+                    userUplineId = userData.uplineId || '';
                 }
             });
         }
         
-        // Simulate commission distribution (would be handled by Cloud Functions in production)
-        function distributeCommissions(userId, packageAmount) {
+        // Distribute commissions
+        function distributeCommissions(userId, packageAmount, directComm, uplineComm, adminF, tradingProf) {
             console.log(`Distributing commissions for package purchase of $${packageAmount}`);
             
             // In a real implementation, this would trigger a Cloud Function
             // that would calculate and distribute commissions according to the referral hierarchy
+            
+            // For demo purposes, we'll simulate the distribution
+            if (userReferralId) {
+                // Add direct referral commission to referrer
+                database.ref(`users/${userReferralId}/referralEarnings`).transaction(current => {
+                    return (current || 0) + directComm;
+                });
+                
+                // Add transaction for referrer
+                const referralTransaction = {
+                    type: 'referral_commission',
+                    amount: directComm,
+                    details: `Direct referral commission from ${userId}`,
+                    status: 'completed',
+                    timestamp: new Date().toISOString(),
+                    fromUserId: userId
+                };
+                database.ref('transactions').push(referralTransaction);
+            }
+            
+            if (userUplineId) {
+                // Distribute upline commissions (2% per level for 5 levels)
+                let currentUplineId = userUplineId;
+                let levels = 5;
+                let commissionPerLevel = packageAmount * 0.02;
+                
+                for (let i = 0; i < levels; i++) {
+                    if (!currentUplineId) break;
+                    
+                    // Add commission to upline
+                    database.ref(`users/${currentUplineId}/uplineCommissions`).transaction(current => {
+                        return (current || 0) + commissionPerLevel;
+                    });
+                    
+                    // Add transaction for upline
+                    const uplineTransaction = {
+                        type: 'upline_commission',
+                        amount: commissionPerLevel,
+                        details: `Level ${i+1} upline commission from ${userId}`,
+                        status: 'completed',
+                        timestamp: new Date().toISOString(),
+                        fromUserId: userId,
+                        level: i+1
+                    };
+                    database.ref('transactions').push(uplineTransaction);
+                    
+                    // Get next upline
+                    database.ref(`users/${currentUplineId}/uplineId`).once('value').then(snap => {
+                        currentUplineId = snap.val();
+                    });
+                }
+            }
+            
+            // Add trading profit to user's account (50%)
+            database.ref(`users/${userId}/tradingProfit`).transaction(current => {
+                return (current || 0) + tradingProf;
+            });
+            
+            // Add transaction for trading profit
+            const profitTransaction = {
+                type: 'trading_profit',
+                amount: tradingProf,
+                details: `Initial trading profit from package purchase`,
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            };
+            database.ref('transactions').push(profitTransaction);
         }
     </script>
 </body>
