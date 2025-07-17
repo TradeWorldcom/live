@@ -156,6 +156,10 @@
             gap: 1.5rem;
         }
         
+        .info-group {
+            margin-bottom: 1rem;
+        }
+        
         .info-group label {
             display: block;
             color: #666;
@@ -170,6 +174,39 @@
             padding: 0.8rem;
             background-color: #f9f9f9;
             border-radius: 4px;
+            word-break: break-all;
+        }
+        
+        .referral-link-container {
+            display: flex;
+            margin-top: 1rem;
+        }
+        
+        .referral-link {
+            flex: 1;
+            padding: 0.8rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .copy-btn {
+            background-color: #002366;
+            color: white;
+            border: none;
+            padding: 0 1rem;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #001a4d;
         }
         
         .form-group {
@@ -219,6 +256,19 @@
             
             .profile-info {
                 grid-template-columns: 1fr;
+            }
+            
+            .referral-link-container {
+                flex-direction: column;
+            }
+            
+            .referral-link {
+                border-radius: 4px 4px 0 0;
+            }
+            
+            .copy-btn {
+                border-radius: 0 0 4px 4px;
+                padding: 0.5rem;
             }
         }
     </style>
@@ -270,6 +320,10 @@
                         <span id="userName">John Doe</span>
                     </div>
                     <div class="info-group">
+                        <label>Mobile Number</label>
+                        <span id="userMobile">+1234567890</span>
+                    </div>
+                    <div class="info-group">
                         <label>Email Address</label>
                         <span id="userEmail">john.doe@example.com</span>
                     </div>
@@ -318,19 +372,31 @@
                         <label>Total Team</label>
                         <span id="totalTeam">42</span>
                     </div>
+                    <div class="info-group">
+                        <label>Your Referral Link</label>
+                        <div class="referral-link-container">
+                            <div class="referral-link" id="referralLink">https://tradeworldcom.github.io/live?ref=INVEST123</div>
+                            <button class="copy-btn" id="copyBtn">Copy</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script>
-        // Firebase configuration (same as index.html)
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCzHmIimieea8H9KzYFDSqD0lGOCZjxHYw",
             authDomain: "myapp-ee226.firebaseapp.com",
             databaseURL: "https://myapp-ee226-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "myapp-ee226",
-            storageBucket: "myapp-ee226.firebasestorage.app",
+            storageBucket: "myapp-ee226.appspot.com",
             messagingSenderId: "272405753135",
             appId: "1:272405753135:web:598ec27c28bcf6b04105da",
             measurementId: "G-D5KYTMJ5WK"
@@ -346,6 +412,8 @@
         const signupBtn = document.getElementById('signupBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const securityForm = document.getElementById('securityForm');
+        const copyBtn = document.getElementById('copyBtn');
+        const referralLink = document.getElementById('referralLink');
         
         // Check auth state
         auth.onAuthStateChanged(user => {
@@ -378,6 +446,20 @@
         logoutBtn.addEventListener('click', () => {
             auth.signOut().then(() => {
                 window.location.href = 'index.html';
+            });
+        });
+        
+        // Copy referral link
+        copyBtn.addEventListener('click', () => {
+            const link = referralLink.textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
             });
         });
         
@@ -423,12 +505,19 @@
                 if (userData) {
                     // Update profile with real data
                     document.getElementById('userName').textContent = userData.name || 'Not set';
+                    document.getElementById('userMobile').textContent = userData.mobile || 'Not set';
                     document.getElementById('userEmail').textContent = userData.email || 'Not set';
                     document.getElementById('accountStatus').textContent = userData.verified ? 'Verified' : 'Unverified';
                     document.getElementById('regDate').textContent = new Date(userData.createdAt).toLocaleDateString() || 'Unknown';
                     document.getElementById('referralCode').textContent = userData.referralCode || 'Not available';
                     document.getElementById('directReferrals').textContent = userData.directReferralsCount || '0';
                     document.getElementById('totalTeam').textContent = userData.totalTeam || '0';
+                    
+                    // Update referral link
+                    if (userData.referralCode) {
+                        const referralUrl = `https://tradeworldcom.github.io/live?ref=${userData.referralCode}`;
+                        document.getElementById('referralLink').textContent = referralUrl;
+                    }
                 }
             });
         }
