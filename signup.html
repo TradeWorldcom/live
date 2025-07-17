@@ -229,6 +229,7 @@
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
+        const referralIdInput = document.getElementById('referralId');
         
         // Toggle password visibility
         togglePassword.addEventListener('click', () => {
@@ -243,15 +244,25 @@
             toggleConfirmPassword.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
         });
         
+        // Auto-fill referral ID from URL if exists
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            
+            if (refParam) {
+                referralIdInput.value = refParam;
+            }
+        });
+        
         // Form submission
-        signupForm.addEventListener('submit', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             // Get form values
             const fullName = document.getElementById('fullName').value.trim();
             const mobileNumber = document.getElementById('mobileNumber').value.trim();
             const email = document.getElementById('email').value.trim();
-            const referralId = document.getElementById('referralId').value.trim();
+            const referralId = referralIdInput.value.trim();
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
             
@@ -264,6 +275,24 @@
             if (password.length < 6) {
                 showError('Password must be at least 6 characters');
                 return;
+            }
+            
+            // Validate referral ID if provided
+            if (referralId) {
+                try {
+                    const refCheck = await database.ref('users')
+                        .orderByChild('referralCode')
+                        .equalTo(referralId)
+                        .once('value');
+                    
+                    if (!refCheck.exists()) {
+                        showError('Invalid referral ID');
+                        return;
+                    }
+                } catch (error) {
+                    showError('Error validating referral ID');
+                    return;
+                }
             }
             
             // Create user with email and password
@@ -283,10 +312,13 @@
                         email: email,
                         referralCode: referralCode,
                         referrerId: referralId || null,
+                        joinedVia: referralId ? 'referral' : 'direct',
                         balance: 0,
                         referralEarnings: 0,
+                        directReferralsCount: 0,
                         teamCount: 0,
-                        createdAt: new Date().toISOString()
+                        createdAt: new Date().toISOString(),
+                        verified: false
                     };
                     
                     // Save user data to database
@@ -338,6 +370,7 @@
                         // Update referrer's direct referrals
                         const updates = {};
                         updates[`users/${referrerId}/directReferrals/${newUserId}`] = true;
+                        updates[`users/${referrerId}/directReferralsCount`] = (referrerData[referrerId].directReferralsCount || 0) + 1;
                         
                         // Get referrer's referral path
                         const referrerPath = referrerData[referrerId].referralPath || [];
